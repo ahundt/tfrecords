@@ -249,7 +249,7 @@ def parse_args():
 
 def main():
     parsed_args = parse_args()
-    print(parsed_args.label_feature)
+
     if parsed_args.stat_type == 'class_stats':
         class_stats(parsed_args.tfrecords, label_feature=parsed_args.label_feature)
     elif parsed_args.stat_type == 'verify_bboxes':
