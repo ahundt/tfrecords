@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import tensorflow as tf
 
-def class_stats(tfrecords):
+def class_stats(tfrecords, label_feature='image/class/label'):
     """
     Sum the number of images and compute the number of images available for each class.
     """
@@ -28,11 +28,11 @@ def class_stats(tfrecords):
     features = tf.parse_single_example(
         serialized_example,
         features={
-            'image/class/label' : tf.FixedLenFeature([], tf.int64)
+            label_feature : tf.FixedLenFeature([], tf.int64)
         }
     )
 
-    label = features['image/class/label']
+    label = features[label_feature]
 
     image_count = 0
     class_image_count = {}
@@ -230,22 +230,28 @@ def parse_args():
 
     parser.add_argument('--stat', dest='stat_type',
                         choices=['class_stats', 'verify_bboxes'],
-                        required=True)
+                        default='class_stats',
+                        required=False)
+
+    parser.add_argument('--label_feature', dest='label_feature',
+                        default='image/class/label',
+                        help='feature string for dataset label', type=str,
+                        required=False)
 
     parser.add_argument('--tfrecords', dest='tfrecords',
                         help='paths to tfrecords files', type=str,
                         nargs='+', required=True)
 
-
     parsed_args = parser.parse_args()
 
     return parsed_args
 
+
 def main():
     parsed_args = parse_args()
-
+    print(parsed_args.label_feature)
     if parsed_args.stat_type == 'class_stats':
-        class_stats(parsed_args.tfrecords)
+        class_stats(parsed_args.tfrecords, label_feature=parsed_args.label_feature)
     elif parsed_args.stat_type == 'verify_bboxes':
         verify_bboxes(parsed_args.tfrecords)
 
